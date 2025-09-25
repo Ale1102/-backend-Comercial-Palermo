@@ -1,0 +1,44 @@
+meta {
+  name: probar
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8000/api/auth/login
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+      "email": "admin@comercialpalermo.com",
+      "contraseña": "admin123"
+  }
+}
+
+script:pre-request {
+  console.log('🚀 Iniciando request de login...');
+  console.log('URL:', req.url);
+  
+}
+
+script:post-response {
+  // Verificar si la respuesta fue exitosa
+  if (res.status === 200) {
+      const data = res.data;
+      
+      if (data.success && data.data && data.data.token) {
+          // Guardar el token en variables de entorno de Bruno
+          bruno.setEnvVar('auth_token', data.data.token);
+          console.log('✅ Token guardado:', data.data.token.substring(0, 20) + '...');
+          
+          // También guardar información del usuario
+          bruno.setEnvVar('user_id', data.data.usuario.id);
+          bruno.setEnvVar('user_name', data.data.usuario.nombre);
+          bruno.setEnvVar('user_email', data.data.usuario.email);
+      }
+  } else {
+      console.log('❌ Error en login:', res.status, res.data);
+  }
+}
