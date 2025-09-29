@@ -4,7 +4,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\VentaController;
 use App\Http\Middleware\VerificarRol;
+use App\Http\Controllers\ReporteController;
+
+
+
 
 /**
  * Rutas públicas (sin autenticación)
@@ -64,6 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
              ->name('productos.update');
         Route::patch('productos/{id}/stock', [ProductoController::class, 'actualizarStock'])
              ->name('productos.stock');
+        Route::patch('/productos/{id}/restore', [ProductoController::class, 'restore']);
     });
     
     // Rutas de productos (solo admin - eliminación)
@@ -82,3 +88,54 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('productos', [ProductoController::class, 'store']);
 });
 
+Route::middleware('auth:sanctum')->group(function () {
+    
+    // Rutas de ventas (admin y empleados)
+    Route::middleware([VerificarRol::class . ':admin,empleado'])->group(function () {
+        Route::post('ventas', [VentaController::class, 'store'])
+             ->name('ventas.store');
+        Route::get('ventas', [VentaController::class, 'index'])
+             ->name('ventas.index');
+        Route::get('ventas/{id}', [VentaController::class, 'show'])
+             ->name('ventas.show');
+        Route::get('ventas/{id}/pdf', [VentaController::class, 'generarPDF'])
+             ->name('ventas.pdf');
+        Route::post('ventas/{id}/email', [VentaController::class, 'enviarEmail'])
+             ->name('ventas.email');
+    });
+    
+    // Rutas de ventas (solo admin)
+    Route::middleware([VerificarRol::class . ':admin'])->group(function () {
+        Route::patch('ventas/{id}/cancelar', [VentaController::class, 'cancelar'])
+             ->name('ventas.cancelar');
+    });
+});
+
+Route::post('ventas/{id}/email', [VentaController::class, 'enviarEmail'])
+     ->middleware(['auth:sanctum', 'verificar.rol:admin,empleado']);
+
+
+Route::middleware('auth:sanctum')->group(function () {
+    
+    // Dashboard (todos los usuarios autenticados)
+    Route::get('dashboard', [ReporteController::class, 'dashboard'])
+         ->name('dashboard');
+    
+    // Reportes (admin y empleados)
+    Route::middleware([VerificarRol::class . ':admin,empleado'])->prefix('reportes')->group(function () {
+        Route::get('ventas', [ReporteController::class, 'reporteVentas'])
+             ->name('reportes.ventas');
+        Route::get('productos-populares', [ReporteController::class, 'productosPopulares'])
+             ->name('reportes.productos-populares');
+        Route::get('stock-bajo', [ReporteController::class, 'stockBajo'])
+             ->name('reportes.stock-bajo');
+        Route::get('financiero', [ReporteController::class, 'reporteFinanciero'])
+             ->name('reportes.financiero');
+    });
+    
+    // Reportes avanzados (solo admin)
+    Route::middleware([VerificarRol::class . ':admin'])->prefix('reportes')->group(function () {
+        Route::get('vendedores', [ReporteController::class, 'reporteVendedores'])
+             ->name('reportes.vendedores');
+    });
+});

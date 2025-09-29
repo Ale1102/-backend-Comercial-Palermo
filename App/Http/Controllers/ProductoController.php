@@ -267,6 +267,31 @@ class ProductoController extends Controller
             ], 500);
         }
     }
+
+    /**
+ * Restaurar producto eliminado (activar)
+ * 
+ * PATCH /api/productos/{id}/restore
+ * Requiere rol: admin
+ */
+public function restore($id): JsonResponse
+{
+    try {
+        $producto = Producto::findOrFail($id);
+        $producto->update(['activo' => true]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Producto restaurado exitosamente'
+        ]);
+        
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Producto no encontrado'
+        ], 404);
+    }
+}
     
     /**
      * Actualizar stock de un producto
