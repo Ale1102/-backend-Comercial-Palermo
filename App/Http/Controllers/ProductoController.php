@@ -98,6 +98,8 @@ class ProductoController extends Controller
             ], 500);
         }
     }
+
+    
     
     /**
      * Obtener un producto específico
@@ -388,6 +390,11 @@ public function restore($id): JsonResponse
         $path = str_replace('/storage/', '', parse_url($url, PHP_URL_PATH));
         Storage::disk('public')->delete($path);
     }
+    public function __construct()
+{
+    // Solo aplicar auth a ciertos métodos, no a index y show
+    $this->middleware('auth:sanctum')->except(['index', 'show']);
+}
     
 }
 

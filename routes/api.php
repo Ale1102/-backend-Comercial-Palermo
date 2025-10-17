@@ -139,3 +139,7 @@ Route::middleware('auth:sanctum')->group(function () {
              ->name('reportes.vendedores');
     });
 });
+
+// Rutas públicas (SIN autenticación)
+Route::get('productos', [ProductoController::class, 'index']);
+Route::get('productos/{id}', [ProductoController::class, 'show']);
