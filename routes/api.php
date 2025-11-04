@@ -7,7 +7,9 @@ use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\VentaController;
 use App\Http\Middleware\VerificarRol;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\UsuarioController;
 
+Route::apiResource('usuarios', UsuarioController::class);
 
 
 
@@ -87,6 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Productos (escritura para admin/empleado)
     Route::post('productos', [ProductoController::class, 'store']);
 });
+
 
 Route::middleware('auth:sanctum')->group(function () {
     
