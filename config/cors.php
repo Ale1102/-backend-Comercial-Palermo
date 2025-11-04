@@ -1,6 +1,5 @@
 <?php
 
-return [
 
     /*
     |--------------------------------------------------------------------------
@@ -15,6 +14,19 @@ return [
     |
     */
 
+    return [
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    
+    'allowed_methods' => ['*'],
+    
+    // IMPORTANTE: Agrega tu URL del frontend aquí
+    'allowed_origins' => [
+        'http://172.20.176.1:3000',  // Tu frontend
+        'http://localhost:3000',      // Para desarrollo local
+    ],
+
+    
+    
     'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
     'allowed_methods' => ['*'],
